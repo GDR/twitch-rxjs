@@ -1,10 +1,13 @@
 {
   "name": "twitch-rxjs",
-  "version": "0.0.1",
-  "main": "index.js",
+  "version": "0.0.2",
+  "description": "Yet another twitch client",
+  "repository": "https://github.com/GDR/twitch-rxjs",
+  "main": "./lib/index.js",
   "license": "MIT",
   "scripts": {
     "start": "ts-node ./src/runner.ts",
+    "build": "tsc",
     "test": "jest"
   },
   "dependencies": {
