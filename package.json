@@ -1,6 +1,6 @@
 {
   "name": "twitch-rxjs",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Yet another twitch client",
   "repository": "https://github.com/GDR/twitch-rxjs",
   "main": "./lib/index.js",
