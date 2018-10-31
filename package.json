@@ -1,17 +1,20 @@
 {
   "name": "twitch-rxjs",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "Yet another twitch client",
   "repository": "https://github.com/GDR/twitch-rxjs",
   "main": "./lib/index.js",
   "license": "MIT",
   "scripts": {
+    "clean": "rimraf lib",
     "start": "ts-node ./src/runner.ts",
-    "build": "tsc",
+    "build": "npm run clean && tsc",
     "test": "jest"
   },
   "dependencies": {
+    "inversify": "^5.0.1",
     "lodash": "^4.17.11",
+    "reflect-metadata": "^0.1.12",
     "rxjs": "^6.3.3",
     "tracer": "^0.9.2",
     "winston": "^3.1.0",
@@ -22,6 +25,7 @@
     "@types/ws": "^6.0.1",
     "dotenv": "^6.1.0",
     "jest": "^23.6.0",
+    "rimraf": "^2.6.2",
     "ts-jest": "^23.10.4",
     "ts-node": "^7.0.1",
     "typescript": "^3.1.3"

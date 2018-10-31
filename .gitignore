@@ -237,3 +237,5 @@ $RECYCLE.BIN/
 
 
 # End of https://www.gitignore.io/api/code,node,linux,macos,windows,intellij+all
+
+lib

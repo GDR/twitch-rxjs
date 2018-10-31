@@ -1,19 +1,22 @@
-
-// client.connect();
-
+import "reflect-metadata";
 import * as dotenv from 'dotenv';
-import {ChatClient, ChatClientOptions} from "./client/chatClient";
+import {TwitchClient, TwitchClientOptions} from "./client/twitchClient";
+import {logger} from "./logger";
 
 dotenv.config();
 
-const options: ChatClientOptions = {
+const options: TwitchClientOptions = {
+    channel: process.env.channel,
     identity: {
         username: process.env.username,
         password: process.env.password,
-    },
-    channel: process.env.channel
+    }
 };
 
-const client = new ChatClient(options);
+const client = TwitchClient.create(options);
+
+client.events().chatObservable.subscribe(value => {
+    logger.info(`${value.username}: ${value.message}`);
+});
 
 client.connect();

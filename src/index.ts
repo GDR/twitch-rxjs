@@ -1,5 +1,5 @@
-import {ChatClient} from "./client/chatClient";
+import {TwitchClient} from "./client/twitchClient";
 
 export default {
-    ChatClient
+    TwitchClient
 };
