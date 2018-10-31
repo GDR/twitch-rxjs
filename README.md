@@ -8,6 +8,7 @@ Just add this library as dependency into your project.
 
 For npm:
 `npm install twitch-rxjs`
+
 For yarn:
 `yarn add twitch-rxjs`
 
