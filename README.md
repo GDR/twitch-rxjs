@@ -1,5 +1,4 @@
 # Twitch RxJs
----
 This is reactive twitch chat client. It helps with creating twitch bots. Currently under active development.
 ## Features
 - Built on top of javascript's reactive extension
