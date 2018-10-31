@@ -1,5 +1,5 @@
-import {TwitchClient} from "./client/twitchClient";
+import { TwitchClient } from './client/twitchClient';
 
 export default {
-    TwitchClient
+  TwitchClient,
 };

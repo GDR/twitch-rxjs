@@ -9,7 +9,8 @@
     "clean": "rimraf lib",
     "start": "ts-node ./src/runner.ts",
     "build": "npm run clean && tsc",
-    "test": "jest"
+    "test": "jest",
+    "lint": "tslint -c ./tslint.json ./src/**/*.ts"
   },
   "dependencies": {
     "inversify": "^5.0.1",
@@ -28,6 +29,8 @@
     "rimraf": "^2.6.2",
     "ts-jest": "^23.10.4",
     "ts-node": "^7.0.1",
+    "tslint": "^5.11.0",
+    "tslint-config-airbnb": "^5.11.0",
     "typescript": "^3.1.3"
   },
   "jest": {
