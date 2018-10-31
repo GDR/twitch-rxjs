@@ -5,7 +5,7 @@ import * as WebSocket from 'ws';
 export class WebSocketHolder {
   @inject('TwitchClientOptions')
 
-    private ws: WebSocket;
+  private ws: WebSocket;
 
   public connect() {
     this.ws = new WebSocket('wss://irc-ws.chat.twitch.tv:443/', 'irc');

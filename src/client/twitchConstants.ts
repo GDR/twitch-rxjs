@@ -1,6 +1,4 @@
-export const CAPABILITIES = [
-
-];
+export const CAPABILITIES = [];
 
 export const MEMBERSHIP_COMMANDS = {
   JOIN: 'JOIN',

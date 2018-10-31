@@ -24,25 +24,26 @@ export interface TwitchClientOptions {
 @injectable()
 export class TwitchClient {
   @inject(TwitchActions)
-    private readonly twitchActions: TwitchActions;
+  private readonly twitchActions: TwitchActions;
   @inject(TwitchEvents)
-    private readonly twitchEvents: TwitchEvents;
+  private readonly twitchEvents: TwitchEvents;
   @inject('TwitchClientOptions')
-    private readonly options: TwitchClientOptions;
+  private readonly options: TwitchClientOptions;
   @inject(WebSocketHolder)
-    private readonly wsHolder: WebSocketHolder;
+  private readonly wsHolder: WebSocketHolder;
 
-  private constructor() {}
+  private constructor() {
+  }
 
   static create(options: TwitchClientOptions): TwitchClient {
     const container = new Container({ autoBindInjectable: true });
 
     container
-            .bind<TwitchClientOptions>('TwitchClientOptions')
-            .toConstantValue(options);
+      .bind<TwitchClientOptions>('TwitchClientOptions')
+      .toConstantValue(options);
     container
-            .bind<WebSocketHolder>(WebSocketHolder)
-            .to(WebSocketHolder).inSingletonScope();
+      .bind<WebSocketHolder>(WebSocketHolder)
+      .to(WebSocketHolder).inSingletonScope();
 
     return container.get(TwitchClient);
   }

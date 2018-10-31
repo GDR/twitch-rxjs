@@ -107,7 +107,8 @@ const self = {
   // Inherit the prototype methods from one constructor into another..
   inherits: (ctor, superCtor) => {
     ctor.super_ = superCtor;
-    const TempCtor = function() {};
+    const TempCtor = function () {
+    };
     TempCtor.prototype = superCtor.prototype;
     ctor.prototype = new TempCtor();
     ctor.prototype.constructor = ctor;
