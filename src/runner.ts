@@ -19,4 +19,9 @@ client.events().chatObservable.subscribe(value => {
     logger.info(`${value.username}: ${value.message}`);
 });
 
+client.events().onConnectObservable.subscribe(() => {
+    logger.info('connected');
+    client.actions().say('Bot has been started');
+});
+
 client.connect();

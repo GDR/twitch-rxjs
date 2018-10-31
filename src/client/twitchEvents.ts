@@ -6,6 +6,7 @@ import {TwitchClientOptions} from "./twitchClient";
 import {Observable, Subject} from "rxjs";
 import * as parser from '../parser/parser';
 import {filter, map, mapTo} from "rxjs/operators";
+import {COMMANDS, EVENTS} from "./twitchConstants";
 
 interface IrcMessage {
     raw: string;
@@ -22,16 +23,22 @@ export class TwitchEvents {
     @inject("TwitchClientOptions")
     private options: TwitchClientOptions;
 
-    private ircMessageSubject: Subject<IrcMessage> = new Subject();
+    private rawMessageSubject: Subject<IrcMessage> = new Subject();
+
+    constructor() {
+        this.onConnectObservable.subscribe(() => {
+            logger.info(`Joining channel #${this.options.channel}`);
+            this.wsHolder.get().send(`${COMMANDS.JOIN} #${this.options.channel}`);
+        });
+
+        this.pingObservable.subscribe(() => {
+            this.wsHolder.get().send(`${COMMANDS.PONG} :tmi.twitch.tv`);
+        });
+    }
 
     public connect() {
         this.wsHolder.get().addListener("open", this.onOpen);
         this.wsHolder.get().addListener("message", this.onMessage);
-
-        this.onConnectObservable.subscribe(() => {
-            logger.info(`Joining channel #${this.options.channel}`);
-            this.wsHolder.get().send(`JOIN #${this.options.channel}`);
-        });
     }
 
     private readonly onOpen = () => {
@@ -53,21 +60,25 @@ export class TwitchEvents {
 
     private handleMessage(data: string) {
         const message: IrcMessage = parser.msg(data);
-        this.ircMessageSubject.next(message);
+        this.rawMessageSubject.next(message);
     };
 
-    public onConnectObservable: Observable<void> = this.ircMessageSubject
+    public rawMessageObservable(): Observable<IrcMessage> {
+        return this.rawMessageSubject;
+    }
+
+    public onConnectObservable: Observable<void> = this.rawMessageSubject
         .pipe(filter(value => {
-            return value.command === '372';
+            return value.command === EVENTS.CONNECTED;
         }))
         .pipe(mapTo(null));
 
     public chatObservable: Observable<{
         username: string,
         message: string,
-    }> = this.ircMessageSubject
+    }> = this.rawMessageSubject
         .pipe(filter(value => {
-            return value.command === 'PRIVMSG'
+            return value.command === EVENTS.PRIVATE_MESSAGE
         }))
         .pipe(map((value => {
             return {
@@ -76,7 +87,14 @@ export class TwitchEvents {
             }
         })));
 
-    private allMessage = this.ircMessageSubject.subscribe(value => {
-        logger.info(value);
-    })
+    public pingObservable: Observable<void> =
+        this.rawMessageSubject.pipe(
+            filter(value => {
+                return value.command === EVENTS.PING;
+            })
+        ).pipe(
+            map(() => {
+                return;
+            })
+        );
 }

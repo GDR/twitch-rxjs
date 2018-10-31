@@ -61,4 +61,8 @@ export class TwitchClient {
     public events(): TwitchEvents {
         return this.twitchEvents;
     }
+
+    public actions(): TwitchActions {
+        return this.twitchActions;
+    }
 }
