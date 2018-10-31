@@ -1,6 +1,6 @@
 {
   "name": "twitch-rxjs",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Yet another twitch client",
   "repository": "https://github.com/GDR/twitch-rxjs",
   "main": "./lib/index.js",
@@ -10,7 +10,8 @@
     "start": "ts-node ./src/runner.ts",
     "build": "npm run clean && tsc",
     "test": "jest",
-    "lint": "tslint -c ./tslint.json ./src/**/*.ts"
+    "lint": "tslint -c ./tslint.json --project ./tsconfig.json ./src/**/*.ts",
+    "release": "np"
   },
   "precommit": [
     "lint"
@@ -29,6 +30,7 @@
     "@types/ws": "^6.0.1",
     "dotenv": "^6.1.0",
     "jest": "^23.6.0",
+    "np": "^3.0.4",
     "pre-commit": "^1.2.2",
     "rimraf": "^2.6.2",
     "ts-jest": "^23.10.4",
