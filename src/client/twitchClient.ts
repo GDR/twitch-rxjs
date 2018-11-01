@@ -1,10 +1,9 @@
-import { Container, inject, injectable, interfaces } from 'inversify';
-import { TwitchActions } from './twitchActions';
-import { TwitchEvents } from './twitchEvents';
 import 'reflect-metadata';
-import { logger } from '../logger';
-import * as WebSocket from 'ws';
-import { WebSocketHolder } from './webSocketHolder';
+import { Container, inject, injectable } from 'inversify';
+import { TwitchActions }                             from './twitchActions';
+import { TwitchEvents }                              from './twitchEvents';
+import { logger }                                    from '../logger';
+import { WebSocketHolder }                           from './webSocketHolder';
 
 export interface TwitchClientConnectionOptions {
   secure?: boolean;
@@ -31,9 +30,6 @@ export class TwitchClient {
   private readonly options: TwitchClientOptions;
   @inject(WebSocketHolder)
   private readonly wsHolder: WebSocketHolder;
-
-  private constructor() {
-  }
 
   static create(options: TwitchClientOptions): TwitchClient {
     const container = new Container({ autoBindInjectable: true });

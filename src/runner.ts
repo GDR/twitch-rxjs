@@ -1,7 +1,7 @@
 import 'reflect-metadata';
-import * as dotenv from 'dotenv';
+import * as dotenv                           from 'dotenv';
 import { TwitchClient, TwitchClientOptions } from './client/twitchClient';
-import { logger } from './logger';
+import { logger }                            from './logger';
 
 dotenv.config();
 
@@ -16,7 +16,7 @@ const options: TwitchClientOptions = {
 const client = TwitchClient.create(options);
 
 client.events().chatObservable.subscribe((value) => {
-  logger.info(`${value.username}: ${value.message}`);
+  logger.info(`${value.user.username}: ${value.message}`);
 });
 
 client.events().onConnectObservable.subscribe(() => {

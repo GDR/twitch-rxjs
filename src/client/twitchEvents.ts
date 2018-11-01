@@ -1,20 +1,14 @@
-import { inject, injectable } from 'inversify';
-import { WebSocketHolder } from './webSocketHolder';
-import { logger } from '../logger';
-import * as WebSocket from 'ws';
-import { TwitchClientOptions } from './twitchClient';
-import { Observable, Subject } from 'rxjs';
-import * as parser from '../parser/parser';
-import { filter, map, mapTo } from 'rxjs/operators';
-import { COMMANDS, EVENTS } from './twitchConstants';
-
-interface IrcMessage {
-  raw: string;
-  prefix: string;
-  command: string;
-  tags: object;
-  params: string[];
-}
+import { inject, injectable }        from 'inversify';
+import { RawMessage, TwitchMessage } from '../entities/twitchEntities';
+import { filterCommand }             from '../rx/twitchRxOperators';
+import { WebSocketHolder }           from './webSocketHolder';
+import { logger }                    from '../logger';
+import * as WebSocket                from 'ws';
+import { TwitchClientOptions }       from './twitchClient';
+import { Observable, Subject }       from 'rxjs';
+import * as parser                   from '../parser/parser';
+import { map, mapTo }                from 'rxjs/operators';
+import { COMMANDS, EVENTS }          from './twitchConstants';
 
 @injectable()
 export class TwitchEvents {
@@ -23,7 +17,7 @@ export class TwitchEvents {
   @inject('TwitchClientOptions')
   private options: TwitchClientOptions;
 
-  private rawMessageSubject: Subject<IrcMessage> = new Subject();
+  private rawMessageSubject: Subject<RawMessage> = new Subject();
 
   constructor() {
     this.onConnectObservable.subscribe(() => {
@@ -63,42 +57,36 @@ export class TwitchEvents {
   }
 
   private handleMessage(data: string) {
-    const message: IrcMessage = parser.msg(data);
+    const message: RawMessage = parser.msg(data);
     this.rawMessageSubject.next(message);
   }
 
-  public rawMessageObservable(): Observable<IrcMessage> {
+  public rawMessageObservable(): Observable<RawMessage> {
     return this.rawMessageSubject;
   }
 
   public onConnectObservable: Observable<void> = this.rawMessageSubject
-    .pipe(filter((value) => {
-      return value.command === EVENTS.CONNECTED;
-    }))
+    .pipe(filterCommand(EVENTS.CONNECTED))
     .pipe(mapTo(null));
 
-  public chatObservable: Observable<{
-    username: string,
-    message: string,
-  }> = this.rawMessageSubject
-    .pipe(filter((value) => {
-      return value.command === EVENTS.PRIVATE_MESSAGE;
-    }))
-    .pipe(map(((value) => {
-      return {
-        username: value.tags['display-name'],
-        message: value.params[1],
-      };
-    })));
+  public chatObservable: Observable<TwitchMessage> = this.rawMessageSubject
+    .pipe(filterCommand(EVENTS.PRIVATE_MESSAGE))
+    .pipe(
+      map((value) => {
+        return {
+          message: value.params[1],
+          user: {
+            username: value.tags['display-name'],
+            displayName: value.tags['display-name'],
+          },
+        };
+      }),
+    );
 
-  public pingObservable: Observable<void> =
-    this.rawMessageSubject.pipe(
-      filter((value) => {
-        return value.command === EVENTS.PING;
-      }),
+  public pingObservable: Observable<void> = this.rawMessageSubject
+    .pipe(
+      filterCommand(EVENTS.PING),
     ).pipe(
-      map(() => {
-        return;
-      }),
+      map(() => {}),
     );
 }
