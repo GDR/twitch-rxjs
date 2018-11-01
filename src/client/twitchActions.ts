@@ -1,9 +1,9 @@
 import 'reflect-metadata';
-import { inject, injectable } from 'inversify';
-import { TwitchEvents } from './twitchEvents';
-import { WebSocketHolder } from './webSocketHolder';
+import { inject, injectable }  from 'inversify';
+import { TwitchEvents }        from './twitchEvents';
+import { WebSocketHolder }     from './webSocketHolder';
 import { TwitchClientOptions } from './twitchClient';
-import { COMMANDS } from './twitchConstants';
+import { COMMANDS }            from './twitchConstants';
 
 @injectable()
 export class TwitchActions {

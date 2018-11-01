@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify';
-import * as WebSocket from 'ws';
+import * as WebSocket         from 'ws';
 
 @injectable()
 export class WebSocketHolder {
