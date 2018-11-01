@@ -6,7 +6,7 @@ import { logger }                    from '../logger';
 import * as WebSocket                from 'ws';
 import { TwitchClientOptions }       from './twitchClient';
 import { Observable, Subject }       from 'rxjs';
-import * as parser                   from '../parser/parser';
+import * as parser                   from 'irc-message';
 import { map, mapTo }                from 'rxjs/operators';
 import { COMMANDS, EVENTS }          from './twitchConstants';
 
@@ -57,7 +57,7 @@ export class TwitchEvents {
   }
 
   private handleMessage(data: string) {
-    const message: RawMessage = parser.msg(data);
+    const message: RawMessage = parser.parse(data);
     this.rawMessageSubject.next(message);
   }
 
