@@ -1,14 +1,18 @@
-import { inject, injectable }                           from 'inversify';
-import { RawMessage, TwitchMessage }                    from '../entities/twitchEntities';
-import { chatMessageMapper, voidMapper, whisperMapper } from '../mappers/twitchMappers';
-import { filterCommand }                                from '../rx/twitchRxOperators';
-import { WebSocketHolder }                              from './webSocketHolder';
-import { logger }                                       from '../logger';
-import * as WebSocket                                   from 'ws';
-import { TwitchClientOptions }                          from './twitchClient';
-import { Observable, Subject }                          from 'rxjs';
-import * as parser                                      from 'irc-message';
-import { EVENTS }                                       from './twitchConstants';
+import { inject, injectable }        from 'inversify';
+import { RawMessage, TwitchMessage } from '../entities/twitchEntities';
+import {
+  chatMessageMapper,
+  filterCommand,
+  voidMapper,
+  whisperMapper,
+}                                    from '../rx/twitchRxOperators';
+import { WebSocketHolder }           from './webSocketHolder';
+import { logger }                    from '../logger';
+import * as WebSocket                from 'ws';
+import { TwitchClientOptions }       from './twitchClient';
+import { Observable, Subject }       from 'rxjs';
+import * as parser                   from 'irc-message';
+import { EVENTS }                    from './twitchConstants';
 
 @injectable()
 export class TwitchEvents {
