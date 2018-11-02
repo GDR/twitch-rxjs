@@ -1,5 +1,6 @@
 import { inject, injectable }        from 'inversify';
 import { RawMessage, TwitchMessage } from '../entities/twitchEntities';
+import { userMapper, voidMapper }    from '../mappers/twitchMappers';
 import { filterCommand }             from '../rx/twitchRxOperators';
 import { WebSocketHolder }           from './webSocketHolder';
 import { logger }                    from '../logger';
@@ -7,7 +8,6 @@ import * as WebSocket                from 'ws';
 import { TwitchClientOptions }       from './twitchClient';
 import { Observable, Subject }       from 'rxjs';
 import * as parser                   from 'irc-message';
-import { map, mapTo }                from 'rxjs/operators';
 import { COMMANDS, EVENTS }          from './twitchConstants';
 
 @injectable()
@@ -20,7 +20,7 @@ export class TwitchEvents {
   private rawMessageSubject: Subject<RawMessage> = new Subject();
 
   constructor() {
-    this.onConnectObservable.subscribe(() => {
+    this.connectedObservable.subscribe(() => {
       logger.info(`Joining channel #${this.options.channel}`);
       this.wsHolder.get().send(`${COMMANDS.JOIN} #${this.options.channel}`);
     });
@@ -65,28 +65,21 @@ export class TwitchEvents {
     return this.rawMessageSubject;
   }
 
-  public onConnectObservable: Observable<void> = this.rawMessageSubject
-    .pipe(filterCommand(EVENTS.CONNECTED))
-    .pipe(mapTo(null));
-
-  public chatObservable: Observable<TwitchMessage> = this.rawMessageSubject
-    .pipe(filterCommand(EVENTS.PRIVATE_MESSAGE))
+  public connectedObservable: Observable<void> = this.rawMessageObservable()
     .pipe(
-      map((value) => {
-        return {
-          message: value.params[1],
-          user: {
-            username: value.tags['display-name'],
-            displayName: value.tags['display-name'],
-          },
-        };
-      }),
+      filterCommand(EVENTS.CONNECTED),
+      voidMapper,
     );
 
-  public pingObservable: Observable<void> = this.rawMessageSubject
+  public chatObservable: Observable<TwitchMessage> = this.rawMessageObservable()
+    .pipe(
+      filterCommand(EVENTS.PRIVATE_MESSAGE),
+      userMapper,
+    );
+
+  public pingObservable: Observable<void> = this.rawMessageObservable()
     .pipe(
       filterCommand(EVENTS.PING),
-    ).pipe(
-      map(() => {}),
+      voidMapper,
     );
 }

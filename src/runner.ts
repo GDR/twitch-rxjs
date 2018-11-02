@@ -15,13 +15,16 @@ const options: TwitchClientOptions = {
 
 const client = TwitchClient.create(options);
 
+client.events().rawMessageObservable().subscribe((data) => {
+  logger.info(data);
+});
+
 client.events().chatObservable.subscribe((value) => {
   logger.info(`${value.user.username}: ${value.message}`);
 });
 
-client.events().onConnectObservable.subscribe(() => {
+client.events().connectedObservable.subscribe(() => {
   logger.info('connected');
-  client.actions().say('Bot has been started');
 });
 
 client.connect();
