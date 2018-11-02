@@ -1,9 +1,10 @@
 import 'reflect-metadata';
 import { Container, inject, injectable } from 'inversify';
-import { TwitchActions }                             from './twitchActions';
-import { TwitchEvents }                              from './twitchEvents';
-import { logger }                                    from '../logger';
-import { WebSocketHolder }                           from './webSocketHolder';
+import { TwitchActions }                 from './twitchActions';
+import { TwitchEvents }                  from './twitchEvents';
+import { logger }                        from '../logger';
+import { TwitchLifecycle }               from './twitchLifecycle';
+import { WebSocketHolder }               from './webSocketHolder';
 
 export interface TwitchClientConnectionOptions {
   secure?: boolean;
@@ -30,6 +31,8 @@ export class TwitchClient {
   private readonly options: TwitchClientOptions;
   @inject(WebSocketHolder)
   private readonly wsHolder: WebSocketHolder;
+  @inject(TwitchLifecycle)
+  private readonly lifecycle: TwitchLifecycle;
 
   static create(options: TwitchClientOptions): TwitchClient {
     const container = new Container({ autoBindInjectable: true });
@@ -40,6 +43,18 @@ export class TwitchClient {
     container
       .bind<WebSocketHolder>(WebSocketHolder)
       .to(WebSocketHolder).inSingletonScope();
+    container
+      .bind<TwitchLifecycle>(TwitchLifecycle)
+      .to(TwitchLifecycle)
+      .inSingletonScope();
+    container
+      .bind<TwitchActions>(TwitchActions)
+      .to(TwitchActions)
+      .inSingletonScope();
+    container
+      .bind<TwitchEvents>(TwitchEvents)
+      .to(TwitchEvents)
+      .inSingletonScope();
 
     return container.get(TwitchClient);
   }
@@ -47,7 +62,7 @@ export class TwitchClient {
   public connect() {
     logger.info('Connecting');
     this.wsHolder.connect();
-    this.twitchEvents.connect();
+    this.lifecycle.connect();
   }
 
   public disconnect() {

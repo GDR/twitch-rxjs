@@ -8,7 +8,7 @@ import * as WebSocket                from 'ws';
 import { TwitchClientOptions }       from './twitchClient';
 import { Observable, Subject }       from 'rxjs';
 import * as parser                   from 'irc-message';
-import { COMMANDS, EVENTS }          from './twitchConstants';
+import { EVENTS }          from './twitchConstants';
 
 @injectable()
 export class TwitchEvents {
@@ -17,34 +17,18 @@ export class TwitchEvents {
   @inject('TwitchClientOptions')
   private options: TwitchClientOptions;
 
-  private rawMessageSubject: Subject<RawMessage> = new Subject();
-
-  constructor() {
-    this.connectedObservable.subscribe(() => {
-      logger.info(`Joining channel #${this.options.channel}`);
-      this.wsHolder.get().send(`${COMMANDS.JOIN} #${this.options.channel}`);
-    });
-
-    this.pingObservable.subscribe(() => {
-      this.wsHolder.get().send(`${COMMANDS.PONG} :tmi.twitch.tv`);
-    });
-  }
+  public rawMessageSubject: Subject<RawMessage> = new Subject();
+  private openConnectionSubject: Subject<void> = new Subject();
 
   public connect() {
-    this.wsHolder.get().addListener('open', this.onOpen);
-    this.wsHolder.get().addListener('message', this.onMessage);
+    const ws = this.wsHolder.get();
+    ws.addListener('open', this.onOpen);
+    ws.addListener('message', this.onMessage);
   }
 
   private readonly onOpen = () => {
     logger.info('Connection established');
-    this.wsHolder.get()
-      .send('CAP REQ :twitch.tv/tags twitch.tv/commands twitch.tv/membership');
-    this.wsHolder.get()
-      .send(`PASS ${this.options.identity.password}`);
-    this.wsHolder.get()
-      .send(`NICK ${this.options.identity.username}`);
-    this.wsHolder.get()
-      .send(`USER ${this.options.identity.username} 8 * :${this.options.identity.username}`);
+    this.openConnectionSubject.next();
   }
 
   private readonly onMessage = (data: WebSocket.Data) => {
@@ -52,32 +36,42 @@ export class TwitchEvents {
       .split('\n')
       .filter(message => message);
     messages.forEach((message) => {
-      this.handleMessage(message);
+      this.rawMessageSubject.next(parser.parse(message));
     });
   }
 
-  private handleMessage(data: string) {
-    const message: RawMessage = parser.parse(data);
-    this.rawMessageSubject.next(message);
-  }
+  /**
+   * Raw message observable
+   */
+  public rawMessageObservable: Observable<RawMessage> = this.rawMessageSubject.asObservable();
 
-  public rawMessageObservable(): Observable<RawMessage> {
-    return this.rawMessageSubject;
-  }
+  /**
+   * WebSocket open status observable
+   */
+  public openConnectionObservable: Observable<void> = this.openConnectionSubject;
 
-  public connectedObservable: Observable<void> = this.rawMessageObservable()
+  /**
+   * Connection to channel observable
+   */
+  public connectedObservable: Observable<void> = this.rawMessageObservable
     .pipe(
       filterCommand(EVENTS.CONNECTED),
       voidMapper,
     );
 
-  public chatObservable: Observable<TwitchMessage> = this.rawMessageObservable()
+  /**
+   * Regular chat message observable
+   */
+  public chatObservable: Observable<TwitchMessage> = this.rawMessageObservable
     .pipe(
       filterCommand(EVENTS.PRIVATE_MESSAGE),
       userMapper,
     );
 
-  public pingObservable: Observable<void> = this.rawMessageObservable()
+  /**
+   * Server's ping observable
+   */
+  public pingObservable: Observable<void> = this.rawMessageObservable
     .pipe(
       filterCommand(EVENTS.PING),
       voidMapper,
