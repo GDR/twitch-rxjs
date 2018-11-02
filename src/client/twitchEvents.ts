@@ -1,14 +1,14 @@
-import { inject, injectable }        from 'inversify';
-import { RawMessage, TwitchMessage } from '../entities/twitchEntities';
-import { userMapper, voidMapper }    from '../mappers/twitchMappers';
-import { filterCommand }             from '../rx/twitchRxOperators';
-import { WebSocketHolder }           from './webSocketHolder';
-import { logger }                    from '../logger';
-import * as WebSocket                from 'ws';
-import { TwitchClientOptions }       from './twitchClient';
-import { Observable, Subject }       from 'rxjs';
-import * as parser                   from 'irc-message';
-import { EVENTS }          from './twitchConstants';
+import { inject, injectable }                           from 'inversify';
+import { RawMessage, TwitchMessage }                    from '../entities/twitchEntities';
+import { chatMessageMapper, voidMapper, whisperMapper } from '../mappers/twitchMappers';
+import { filterCommand }                                from '../rx/twitchRxOperators';
+import { WebSocketHolder }                              from './webSocketHolder';
+import { logger }                                       from '../logger';
+import * as WebSocket                                   from 'ws';
+import { TwitchClientOptions }                          from './twitchClient';
+import { Observable, Subject }                          from 'rxjs';
+import * as parser                                      from 'irc-message';
+import { EVENTS }                                       from './twitchConstants';
 
 @injectable()
 export class TwitchEvents {
@@ -65,7 +65,16 @@ export class TwitchEvents {
   public chatObservable: Observable<TwitchMessage> = this.rawMessageObservable
     .pipe(
       filterCommand(EVENTS.PRIVATE_MESSAGE),
-      userMapper,
+      chatMessageMapper,
+    );
+
+  /**
+   * Whisper message observable
+   */
+  public whisperObservable: Observable<TwitchMessage> = this.rawMessageSubject
+    .pipe(
+      filterCommand(EVENTS.WHISPER),
+      whisperMapper,
     );
 
   /**

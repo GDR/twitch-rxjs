@@ -18,8 +18,10 @@ export const COMMANDS = {
   ...MEMBERSHIP_COMMANDS,
   ...SERVER_COMANDS,
   PRIVATE_MESSAGE: 'PRIVMSG',
+  WHISPER: 'PRIVMSG #jtv',
 };
 
 export const EVENTS = {
   ...COMMANDS,
+  WHISPER: 'WHISPER',
 };

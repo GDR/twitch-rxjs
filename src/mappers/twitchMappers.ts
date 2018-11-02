@@ -10,7 +10,21 @@ export const voidMapper = (source: Observable<RawMessage>): Observable<void> => 
   );
 };
 
-export const userMapper = (source: Observable<RawMessage>): Observable<TwitchMessage> => {
+export const chatMessageMapper = (source: Observable<RawMessage>): Observable<TwitchMessage> => {
+  return source.pipe(
+    map((value: RawMessage): TwitchMessage => {
+      return {
+        user: {
+          displayName: value.tags['display-name'],
+          username: value.tags['display-name'],
+        },
+        message: value.params[1],
+      };
+    }),
+  );
+};
+
+export const whisperMapper = (source: Observable<RawMessage>): Observable<TwitchMessage> => {
   return source.pipe(
     map((value: RawMessage): TwitchMessage => {
       return {

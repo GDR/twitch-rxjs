@@ -1,6 +1,5 @@
 import 'reflect-metadata';
 import * as dotenv                           from 'dotenv';
-import { log }                               from 'util';
 import { TwitchClient, TwitchClientOptions } from './client/twitchClient';
 import { logger }                            from './logger';
 
@@ -22,6 +21,11 @@ client.events().rawMessageSubject.subscribe((data) => {
 
 client.events().chatObservable.subscribe((value) => {
   logger.info(`${value.user.displayName}: ${value.message}`);
+});
+
+client.events().whisperObservable.subscribe((value) => {
+  logger.info(`Got whisper from ${value.user.displayName}: ${value.message}`);
+  client.actions().whisper(value.user.username, 'Hi!');
 });
 
 client.connect();

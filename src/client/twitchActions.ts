@@ -17,7 +17,11 @@ export class TwitchActions {
   constructor() {
   }
 
-  public say(msg: string) {
-    this.wsHolder.get().send(`${COMMANDS.PRIVATE_MESSAGE} #${this.options.channel} :${msg}`);
+  public say(message: string) {
+    this.wsHolder.get().send(`${COMMANDS.PRIVATE_MESSAGE} #${this.options.channel} :${message}`);
+  }
+
+  public whisper(username: string, message: string) {
+    this.wsHolder.get().send(`${COMMANDS.WHISPER} :/w ${username} ${message}`);
   }
 }
