@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import { Container, inject, injectable } from 'inversify';
+import { twitchModule }                  from '../ioc/twitchIocModule';
 import { TwitchActions }                 from './twitchActions';
 import { TwitchEvents }                  from './twitchEvents';
 import { logger }                        from '../logger';
@@ -36,26 +37,7 @@ export class TwitchClient {
 
   static create(options: TwitchClientOptions): TwitchClient {
     const container = new Container({ autoBindInjectable: true });
-
-    container
-      .bind<TwitchClientOptions>('TwitchClientOptions')
-      .toConstantValue(options);
-    container
-      .bind<WebSocketHolder>(WebSocketHolder)
-      .to(WebSocketHolder).inSingletonScope();
-    container
-      .bind<TwitchLifecycle>(TwitchLifecycle)
-      .to(TwitchLifecycle)
-      .inSingletonScope();
-    container
-      .bind<TwitchActions>(TwitchActions)
-      .to(TwitchActions)
-      .inSingletonScope();
-    container
-      .bind<TwitchEvents>(TwitchEvents)
-      .to(TwitchEvents)
-      .inSingletonScope();
-
+    container.load(twitchModule(options));
     return container.get(TwitchClient);
   }
 

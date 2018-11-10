@@ -1,10 +1,8 @@
-import { inject, injectable } from 'inversify';
+import { injectable } from 'inversify';
 import * as WebSocket         from 'ws';
 
 @injectable()
 export class WebSocketHolder {
-  @inject('TwitchClientOptions')
-
   private ws: WebSocket;
 
   public connect() {

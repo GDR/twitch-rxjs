@@ -8,10 +8,10 @@ import { WebSocketHolder }     from './webSocketHolder';
 
 @injectable()
 export class TwitchLifecycle {
-  private options: TwitchClientOptions;
-  private events: TwitchEvents;
-  private actions: TwitchActions;
-  private wsHolder: WebSocketHolder;
+  private readonly options: TwitchClientOptions;
+  private readonly events: TwitchEvents;
+  private readonly actions: TwitchActions;
+  private readonly wsHolder: WebSocketHolder;
 
   constructor(
     @inject('TwitchClientOptions')

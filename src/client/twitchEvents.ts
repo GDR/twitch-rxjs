@@ -17,12 +17,12 @@ import { EVENTS }                    from './twitchConstants';
 @injectable()
 export class TwitchEvents {
   @inject(WebSocketHolder)
-  private wsHolder: WebSocketHolder;
+  private readonly wsHolder: WebSocketHolder;
   @inject('TwitchClientOptions')
-  private options: TwitchClientOptions;
+  private readonly options: TwitchClientOptions;
 
-  public rawMessageSubject: Subject<RawMessage> = new Subject();
-  private openConnectionSubject: Subject<void> = new Subject();
+  public readonly rawMessageSubject: Subject<RawMessage> = new Subject();
+  private readonly openConnectionSubject: Subject<void> = new Subject();
 
   public connect() {
     const ws = this.wsHolder.get();
@@ -47,17 +47,18 @@ export class TwitchEvents {
   /**
    * Raw message observable
    */
-  public rawMessageObservable: Observable<RawMessage> = this.rawMessageSubject.asObservable();
+  public readonly rawMessageObservable: Observable<RawMessage> = this.rawMessageSubject
+    .asObservable();
 
   /**
    * WebSocket open status observable
    */
-  public openConnectionObservable: Observable<void> = this.openConnectionSubject;
+  public readonly openConnectionObservable: Observable<void> = this.openConnectionSubject;
 
   /**
    * Connection to channel observable
    */
-  public connectedObservable: Observable<void> = this.rawMessageObservable
+  public readonly connectedObservable: Observable<void> = this.rawMessageObservable
     .pipe(
       filterCommand(EVENTS.CONNECTED),
       voidMapper,
@@ -66,7 +67,7 @@ export class TwitchEvents {
   /**
    * Regular chat message observable
    */
-  public chatObservable: Observable<TwitchMessage> = this.rawMessageObservable
+  public readonly chatObservable: Observable<TwitchMessage> = this.rawMessageObservable
     .pipe(
       filterCommand(EVENTS.PRIVATE_MESSAGE),
       chatMessageMapper,
@@ -75,7 +76,7 @@ export class TwitchEvents {
   /**
    * Whisper message observable
    */
-  public whisperObservable: Observable<TwitchMessage> = this.rawMessageSubject
+  public readonly whisperObservable: Observable<TwitchMessage> = this.rawMessageSubject
     .pipe(
       filterCommand(EVENTS.WHISPER),
       whisperMapper,
@@ -84,7 +85,7 @@ export class TwitchEvents {
   /**
    * Server's ping observable
    */
-  public pingObservable: Observable<void> = this.rawMessageObservable
+  public readonly pingObservable: Observable<void> = this.rawMessageObservable
     .pipe(
       filterCommand(EVENTS.PING),
       voidMapper,
